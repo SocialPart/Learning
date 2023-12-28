@@ -99,3 +99,6 @@ pos = nx.spring_layout(G, k=None, pos={0: [0.0, 1.0],
 nx.draw(G, pos, with_labels=True, node_color='lightblue', node_size=200, edge_color='w')
 nx.draw(spanTreesGraph[0], pos, with_labels=True, node_color='lightgreen', node_size=200, edge_color='r')
 plt.show()
+
+fig, ax = plt.subplots(5,3)
+plt.show()
