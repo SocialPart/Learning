@@ -2,103 +2,146 @@ from itertools import product
 import networkx as nx
 import numpy as np
 import matplotlib.pyplot as plt
+import Initial as init
+import defs
+
+print("Number of Spanning Trees : ",
+      defs.num_span_trees(init.G_2))  # Количество остовных деревьев (только для неориентированных графов)
+span_trees_graph_G_2 = defs.spanning_trees_generator(init.G_2)
+
+"""Фиксируем позиции узлов графов для понятного отображения"""
+pos_G_2 = nx.spring_layout(init.G_2, k=None, pos=init.positions_G_2, fixed=init.nodes_G_2,
+                           iterations=2, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+
+# Строим начальный граф
+nx.draw(init.G_2, pos_G_2, with_labels=True, labels=init.nam_nodes_G_2,
+        font_size=8, font_weight='bold', node_color='lightgreen', node_size=250, edge_color='r')
+plt.show()
+
+# Строим все возможные варианты графов
+"""Создаем большой график с множеством схем"""
+
+fig, ax = plt.subplots(nrows=5, ncols=3, figsize=(14, 14))
+
+"""Для увеличения читаемости графов, задаем промежуточное расстояние"""
+
+plt.subplots_adjust(wspace=0.1, hspace=1.3)
+
+"""В цикле перебираем графы и отрисовываем в соответствующей позиции"""
+
+n = 0
+for i in range(5):
+    for j in range(3):
+        ax[i][j].set_title(str(n + 1), fontsize=10, verticalalignment='top', fontweight='bold')
+        # nx.draw(G_2_section, pos, ax=ax[i][j], with_labels=False,
+        # node_color='lightblue', node_size=100, edge_color='w')
+        nx.draw(span_trees_graph_G_2[n], pos_G_2, ax=ax[i][j],
+                with_labels=True, labels=init.nam_nodes_G_2,
+                font_size=8, font_weight='bold', node_color='lightgreen',
+                node_size=150, edge_color='r')
+        n += 1
+plt.show()
+
+print("Number of Spanning Trees : ",
+      defs.num_span_trees(init.G_1_1))  # Количество остовных деревьев (только для неориентированных графов)
+span_trees_graph_G_1_1 = defs.spanning_trees_generator(init.G_1_1)
+
+"""Фиксируем позиции узлов графов для понятного отображения"""
+pos_G_1_1 = nx.spring_layout(init.G_1_1, k=None, pos=init.positions_G_1_1, fixed=init.nodes_G_1_1,
+                           iterations=2, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+
+# Строим начальный граф
+nx.draw(init.G_1_1, pos_G_1_1, with_labels=True, labels=init.nam_nodes_G_1_1,
+        font_size=8, font_weight='bold', node_color='lightgreen', node_size=250, edge_color='r')
+plt.show()
+
+# Строим все возможные варианты графов
+"""Создаем большой график с множеством схем"""
+
+fig, ax = plt.subplots(nrows=5, ncols=3, figsize=(14, 14))
+
+"""Для увеличения читаемости графов, задаем промежуточное расстояние"""
+
+plt.subplots_adjust(wspace=0.1, hspace=1.3)
+
+"""В цикле перебираем графы и отрисовываем в соответствующей позиции"""
+
+n = 0
+for i in range(5):
+    for j in range(3):
+        ax[i][j].set_title(str(n + 1), fontsize=10, verticalalignment='top', fontweight='bold')
+        # nx.draw(G_2_section, pos, ax=ax[i][j], with_labels=False,
+        # node_color='lightblue', node_size=100, edge_color='w')
+        nx.draw(span_trees_graph_G_1_1[n], pos_G_1_1, ax=ax[i][j],
+                with_labels=True, labels=init.nam_nodes_G_1_1,
+                font_size=8, font_weight='bold', node_color='lightgreen',
+                node_size=150, edge_color='r')
+        n += 1
+plt.show()
 
 
-# Optional: Calculate the total number of spanning trees for a given graph (g) using the Matrix Tree Theorem (Kirchhoff's theorem),
-def numSpanTrees(g) -> int:
-    if not nx.is_connected(g):
-        print("Only for connected graphs")
-        return 0
-    if nx.is_directed(g): nx.to_undirected(g)
-    n = g.number_of_nodes()
-    laplacian_matrix = nx.laplacian_matrix(g).toarray()  # Calculate the Laplacian matrix
-    cofactor_matrix = laplacian_matrix[1:n, 1:n]  # Choose any cofactor by excluding the first row and column
-    determinant = np.linalg.det(cofactor_matrix)  # Calculate the determinant of an cofactor of Laplacian matrix
-    return int(np.round(abs(determinant)))
 
+print("Number of Spanning Trees : ",
+      defs.num_span_trees(init.G_1_2))  # Количество остовных деревьев (только для неориентированных графов)
+span_trees_graph_G_1_2 = defs.spanning_trees_generator(init.G_1_2)
 
-# Generate all spanning trees using contraction-deletion algorithm:
-def spanTrees(trs, Edg, all_span_trees, k):
-    if k == 0:
-        all_span_trees.extend(product(*trs))  # Expand parallels edges using the Cartesian product
+"""Фиксируем позиции узлов графов для понятного отображения"""
+pos_G_1_2 = nx.spring_layout(init.G_1_2, k=None, pos=init.positions_G_1_2, fixed=init.nodes_G_1_2,
+                           iterations=2, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
 
-    for i in range(k):
-        if Edg[k][i] == []: continue
-        trs.append(Edg[k][i])
-        Edg[i] = [Edg[i][j] + Edg[k][j] for j in range(i)]  # Contraction
-        spanTrees(trs, Edg, all_span_trees, k - 1)
-        trs.pop()
-        [Edg[i][j].pop() for j in range(i) for _ in range(len(Edg[k][j]))]  # Deletion
+# Строим начальный граф
+nx.draw(init.G_1_2, pos_G_1_2, with_labels=True, labels=init.nam_nodes_G_1_2,
+        font_size=8, font_weight='bold', node_color='lightgreen', node_size=250, edge_color='r')
+plt.show()
 
+# Строим все возможные варианты графов
+"""Создаем большой график с множеством схем"""
 
-# Helper function
-def Spanning_Trees_Generator(g, hch=False):
-    if not nx.is_connected(g):
-        print("Only for connected graphs")
-        return 0
-    if nx.is_directed(g): nx.to_undirected(g)
-    n = g.number_of_nodes()
-    edgs = list(g.edges)
-    Edg = [[[] for _ in range(n)] for _ in range(n)]
-    mx = len(edgs)
-    edgNum = dict()  # dictionary designed to store labeled edges where the keys are integer labels for the edges, and the values are tuples representing the ordinary edge definitions (in, out)
+fig, ax = plt.subplots(nrows=5, ncols=3, figsize=(14, 14))
 
-    for ed in edgs:
-        i, j = sorted(ed)
-        Edg[j][i] = [mx]
-        edgNum[mx] = ed
-        mx -= 1
-    all_span_trees = []
-    spanTrees([], Edg, all_span_trees, n - 1)
+"""Для увеличения читаемости графов, задаем промежуточное расстояние"""
 
-    if hch:
-        return all_span_trees  # Generate only the labeled edges (Keys)
-    else:
-        return [nx.Graph(edgNum[k] for k in element) for element in
-                all_span_trees]  # Generate spanning trees as NetworkX graphics objects
+plt.subplots_adjust(wspace=0.1, hspace=1.3)
 
+"""В цикле перебираем графы и отрисовываем в соответствующей позиции"""
 
-# Example usage
-G = nx.Graph()
+n = 0
+for i in range(5):
+    for j in range(3):
+        ax[i][j].set_title(str(n + 1), fontsize=10, verticalalignment='top', fontweight='bold')
+        # nx.draw(G_2_section, pos, ax=ax[i][j], with_labels=False,
+        # node_color='lightblue', node_size=100, edge_color='w')
+        nx.draw(span_trees_graph_G_1_2[n], pos_G_1_2, ax=ax[i][j],
+                with_labels=True, labels=init.nam_nodes_G_1_2,
+                font_size=8, font_weight='bold', node_color='lightgreen',
+                node_size=150, edge_color='r')
+        n += 1
+plt.show()
 
-G.add_node(0)
-G.add_node(1)
-G.add_node(2)
-G.add_node(3)
-G.add_node(4)
-G.add_node(5)
-G.add_node(6)
-G.add_node(7)
+# path1=[]
+# path2=[]
+#
+# for path in sorted(nx.all_simple_edge_paths(spanTreesGraph[0], 4, 0)):
+#     path1.append(path)
+#
+# for path in sorted(nx.all_simple_edge_paths(spanTreesGraph[], 0, 4)):
+#     path2.append(path)
+#
+# f = path1 == path2
+# print(f, path1, path2)
 
-G.add_edges_from((
-    (0, 1),
-
-    (1, 2),
-    (1, 5),
-    (2, 3),
-    (2, 6),
-    (3, 7),
-    (7, 6),
-    (6, 5),
-    (5, 4),
-))
-# nx.draw(G)
+# spanTreesGraph[1].remove_edge(5,1)
+# spanTreesGraph[2].remove_edge(2,6)
+#
+# nx.draw(G, pos, with_labels=True, node_color='lightblue', node_size=100, edge_color='w')
+# nx.draw(spanTreesGraph[1], pos, with_labels=True, node_color='lightgreen', node_size=50)
 # plt.show()
-print("Number of Spanning Trees : ", numSpanTrees(G))  # Optional and only for undirected graph
-spanTreesGraph = Spanning_Trees_Generator(G)
-
-# Plot the first spanning tree
-pos = nx.spring_layout(G, k=None, pos={0: [0.0, 1.0],
-                                       1: [1.0, 1.0],
-                                       2: [2.0, 1.0],
-                                       3: [3.0, 1.0],
-                                       4: [0.0, 0.0],
-                                       5: [1.0, 0.0],
-                                       6: [2.0, 0.0],
-                                       7: [3.0, 0.0]}, fixed=[0, 1, 2, 3, 4, 5, 6, 7], iterations=2, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
-nx.draw(G, pos, with_labels=True, node_color='lightblue', node_size=200, edge_color='w')
-nx.draw(spanTreesGraph[0], pos, with_labels=True, node_color='lightgreen', node_size=200, edge_color='r')
-plt.show()
-
-fig, ax = plt.subplots(5,3)
-plt.show()
+# nx.draw(G, pos, with_labels=True, node_color='lightblue', node_size=100, edge_color='w')
+# nx.draw(spanTreesGraph[2], pos, with_labels=True, node_color='lightgreen', node_size=50)
+# plt.show()
+#
+# f = spanTreesGraph[1].edges() == spanTreesGraph[2].edges()
+# print(f)
+# print(len(spanTreesGraph))
+# spanTreesGraph.pop(1)
+# print(len(spanTreesGraph))
