@@ -11,40 +11,7 @@ print("Number of Spanning Trees : ",
       defs.num_span_trees(init.G_2))  # Количество остовных деревьев (только для неориентированных графов)
 span_trees_graph_G_2 = defs.spanning_trees_generator(init.G_2)
 
-# """Фиксируем позиции узлов графов для понятного отображения"""
-# pos_G_2 = nx.spring_layout(init.G_2, k=None, pos=init.positions_G_2, fixed=init.nodes_G_2,
-#                            iterations=2, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
-#
-# # Строим начальный граф
-# nx.draw(init.G_2, pos_G_2, with_labels=True, labels=init.nam_nodes_G_2,
-#         font_size=8, font_weight='bold', node_color='lightgreen', node_size=250, edge_color='r')
-# plt.show()
-#
-# # Строим все возможные варианты графов
-# """Создаем большой график с множеством схем"""
-#
-# fig, ax = plt.subplots(nrows=5, ncols=3, figsize=(14, 14))
-#
-# """Для увеличения читаемости графов, задаем промежуточное расстояние"""
-#
-# plt.subplots_adjust(wspace=0.1, hspace=1.3)
-#
-# """В цикле перебираем графы и отрисовываем в соответствующей позиции"""
-#
-# n = 0
-# for i in range(5):
-#     for j in range(3):
-#         ax[i][j].set_title(str(n + 1), fontsize=10, verticalalignment='top', fontweight='bold')
-#         # nx.draw(G_2_section, pos, ax=ax[i][j], with_labels=False,
-#         # node_color='lightblue', node_size=100, edge_color='w')
-#         nx.draw(span_trees_graph_G_2[n], pos_G_2, ax=ax[i][j],
-#                 with_labels=True, labels=init.nam_nodes_G_2,
-#                 font_size=8, font_weight='bold', node_color='lightgreen',
-#                 node_size=150, edge_color='r')
-#         n += 1
-# plt.show()
-
-"Удаляем ребра из СШ1+СШ2"
+"Удаляем ребра из СШ1+СШ2 закоментить блок если надо построить первоначальную схему"
 for i in range(len(span_trees_graph_G_2)):
     if span_trees_graph_G_2[i].has_edge(1,5):
         span_trees_graph_G_2[i].remove_edge(1,5)
@@ -61,37 +28,35 @@ for i in range(len(span_trees_graph_G_2)):
 t = defs.ind_double_graphs(span_trees_graph_G_2)
 print(t)
 
-"""Зануление повторяющихся графов для удобства отображения"""
+"""Зануление повторяющихся графов для удобства отображения. Закоментить блок для продолжения работы, а то графы будут неверные"""
 
-for i in range(len(span_trees_graph_G_2) - 1):
-    for j in range(i, (len(span_trees_graph_G_2) - 1)):
-        if defs.graphs_equal(span_trees_graph_G_2[i], span_trees_graph_G_2[j+1]):
-            span_trees_graph_G_2[i] = nx.Graph()
-
-
-"""Создаем пустой список под графы с двусторонним питанием"""
-ss = []
+# for i in range(len(span_trees_graph_G_2) - 1):
+#     for j in range(i, (len(span_trees_graph_G_2) - 1)):
+#         if defs.graphs_equal(span_trees_graph_G_2[i], span_trees_graph_G_2[j+1]):
+#             span_trees_graph_G_2[i] = nx.Graph()
 
 
+"""Создаем пустой список под графы с двусторонним питанием. Далее в расчётах будем брать его"""
+
+stg_G_2 = []
+
+"""Скорректированные графы перемещаем в новый список. 
+Нужно отметить, что итерация начинается с начала и последний элемент исходного графа
+добавится в новый список по умолчанию"""
 
 for i in range(len(span_trees_graph_G_2) - 1):
     c = 0
-    for j in range(i, (len(span_trees_graph_G_2) - 1)):
+    for j in range(i, (len(span_trees_graph_G_2)- 1)):
         if defs.graphs_equal(span_trees_graph_G_2[i], span_trees_graph_G_2[j+1]):
-            c += 1
+            if j != 0:
+                c += 1
     if c == 0:
-        ss.append(span_trees_graph_G_2[i])
+        stg_G_2.append(span_trees_graph_G_2[i])
     print("Количество элемента {0} равно {1}".format(i, c))
+stg_G_2.append(span_trees_graph_G_2[14])
+print(len(stg_G_2))
 
-
-print(len(ss))
-# Строим начальный граф
-pos_G_2 = nx.spring_layout(span_trees_graph_G_2[-1], k=None, pos=init.positions_G_2, fixed=init.nodes_G_2,
-                           iterations=2, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
-nx.draw(span_trees_graph_G_2[-1], pos_G_2, with_labels=True, labels=init.nam_nodes_G_2,
-        font_size=8, font_weight='bold', node_color='lightgreen', node_size=250, edge_color='r')
-#plt.show()
-
+"""Отображение первоначальной схемы и ее производных (не поправленной копии)"""
 
 """Фиксируем позиции узлов графов для понятного отображения"""
 pos_G_2 = nx.spring_layout(init.G_2, k=None, pos=init.positions_G_2, fixed=init.nodes_G_2,
@@ -100,7 +65,7 @@ pos_G_2 = nx.spring_layout(init.G_2, k=None, pos=init.positions_G_2, fixed=init.
 # Строим начальный граф
 nx.draw(init.G_2, pos_G_2, with_labels=True, labels=init.nam_nodes_G_2,
         font_size=8, font_weight='bold', node_color='lightgreen', node_size=250, edge_color='r')
-#plt.show()
+plt.show()
 
 # Строим все возможные варианты графов
 """Создаем большой график с множеством схем"""
@@ -125,6 +90,36 @@ for i in range(5):
                 node_size=150, edge_color='r')
         n += 1
 plt.show()
+
+
+"""Проверка содержания stg_G_2. Закоментить, если не нужно"""
+
+"""Фиксируем позиции узлов графов для понятного отображения"""
+pos_G_2 = nx.spring_layout(init.G_2, k=None, pos=init.positions_G_2, fixed=init.nodes_G_2,
+                           iterations=2, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
+
+# Строим все возможные варианты графов
+
+fig, ax = plt.subplots(nrows=5, ncols=2)
+plt.subplots_adjust(wspace=0.1, hspace=1.3)
+n = 0
+for i in range(5):
+    for j in range(2):
+        ax[i][j].set_title(str(n + 1), fontsize=2, verticalalignment='top', fontweight='bold')
+        # nx.draw(G_2_section, pos, ax=ax[i][j], with_labels=False,
+        # node_color='lightblue', node_size=100, edge_color='w')
+        nx.draw(stg_G_2[n], pos_G_2, ax=ax[i][j],
+                with_labels=True, labels=init.nam_nodes_G_2,
+                font_size=8, font_weight='bold', node_color='lightgreen',
+                node_size=150, edge_color='r')
+        n += 1
+plt.show()
+nx.draw(stg_G_2[10], pos_G_2,
+                with_labels=True, labels=init.nam_nodes_G_2,
+                font_size=8, font_weight='bold', node_color='lightgreen',
+                node_size=150, edge_color='r')
+plt.show()
+print(stg_G_2[7].edges())
 
 #
 # """СШ1"""
