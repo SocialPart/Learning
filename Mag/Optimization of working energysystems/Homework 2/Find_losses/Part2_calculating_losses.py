@@ -1,4 +1,6 @@
-import Initial as init
+import networkx as nx
+import matplotlib.pyplot as plt
+import Initial_for_losses as init
 import defs
 
 """СШ1+СШ2"""
@@ -29,7 +31,7 @@ t = defs.ind_double_graphs(span_trees_graph_G_2)
 
 stg_G_2 = []
 
-"""Скорректированные графы перемещаем в новый список. 
+"""Скорректированные графы перемещаем в новый список.
 Нужно отметить, что итерация начинается с начала и последний элемент исходного графа
 добавится в новый список по умолчанию"""
 
@@ -45,10 +47,24 @@ for i in range(len(span_trees_graph_G_2) - 1):
 stg_G_2.append(span_trees_graph_G_2[14])
 
 
+"""Делаем график взвешенным для дальнейших расчётов"""
+
+edges_G_2 = {(0, 1): {'weight': 1.2}, (1, 2): {'weight': 0.9}, (1, 5): {'weight': 0.0},
+             (2, 3): {'weight': 0.6}, (2, 6): {'weight': 0.0}, (3, 7): {'weight': 0.0},
+             (7, 6): {'weight': 0.3}, (6, 5): {'weight': 0.6}, (5, 4): {'weight': 1.2}}
+
+for i in stg_G_2:
+    i.add_nodes_from([(0, dict(power=0)), (1, dict(power=504)), (2, dict(power=752)), (3, dict(power=964)),
+                      (4, dict(power=0)), (5, dict(power=576)), (6, dict(power=988)), (7, dict(power=1212))])
+    nx.set_edge_attributes(i, edges_G_2)
+
+powers = nx.get_node_attributes(stg_G_2[0], 'power')
+
+
 """Отображение первоначальной схемы и ее производных (не поправленной копии)"""
 
 # """Фиксируем позиции узлов графов для понятного отображения"""
-# pos_G_2 = nx.spring_layout(init.G_2, k=None, pos=init.positions_G_2, fixed=init.nodes_G_2,
+# pos_G_2 = nx.spring_layout(init.G_2, k=None, pos=init.positions_G_2, fixed=[0, 1, 2, 3, 4, 5, 6, 7],
 #                            iterations=2, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
 #
 # # Строим начальный граф
@@ -79,6 +95,8 @@ stg_G_2.append(span_trees_graph_G_2[14])
 #                 node_size=150, edge_color='r')
 #         n += 1
 # plt.show()
+
+
 
 """Проверка содержания stg_G_2. Закоментить, если не нужно"""
 
