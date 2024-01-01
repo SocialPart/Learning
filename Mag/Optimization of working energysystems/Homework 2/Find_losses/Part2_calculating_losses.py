@@ -2,6 +2,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import Initial_for_losses as init
 import defs
+import pandas as pd
 
 """СШ1+СШ2"""
 
@@ -47,18 +48,39 @@ for i in range(len(span_trees_graph_G_2) - 1):
 stg_G_2.append(span_trees_graph_G_2[14])
 
 
-"""Делаем график взвешенным для дальнейших расчётов"""
+"""Делаем график взвешенным для дальнейших расчётов. Задаем первоначальные парметры в узлах"""
 
-edges_G_2 = {(0, 1): {'weight': 1.2}, (1, 2): {'weight': 0.9}, (1, 5): {'weight': 0.0},
-             (2, 3): {'weight': 0.6}, (2, 6): {'weight': 0.0}, (3, 7): {'weight': 0.0},
-             (7, 6): {'weight': 0.3}, (6, 5): {'weight': 0.6}, (5, 4): {'weight': 1.2}}
+"""Задаем параметры линий"""
+
+edges_G_2 = {(0, 1): {'resistance': 1.2}, (1, 2): {'resistance': 0.9},
+             (1, 5): {'resistance': 0.0}, (2, 3): {'resistance': 0.6},
+             (2, 6): {'resistance': 0.0}, (3, 7): {'resistance': 0.0},
+             (7, 6): {'resistance': 0.3}, (6, 5): {'resistance': 0.6},
+             (5, 4): {'resistance': 1.2}}
+
+"""Задаем парамтеры узлов"""
+
+nodes_G_2 = [[0, dict(power=0)], [1, dict(power=504)], [2, dict(power=752)], [3, dict(power=964)],
+             [4, dict(power=0)], [5, dict(power=576)], [6, dict(power=988)], [7, dict(power=1212)]]
+
+"""В цикле добавляем все  атрибуты в узлы и линии, т.к. после выдачи всех вариантов взвешенных графов удалились"""
 
 for i in stg_G_2:
-    i.add_nodes_from([(0, dict(power=0)), (1, dict(power=504)), (2, dict(power=752)), (3, dict(power=964)),
-                      (4, dict(power=0)), (5, dict(power=576)), (6, dict(power=988)), (7, dict(power=1212))])
+    i.add_nodes_from(nodes_G_2)
     nx.set_edge_attributes(i, edges_G_2)
 
-powers = nx.get_node_attributes(stg_G_2[0], 'power')
+temp = []
+paths = []
+
+nodes_G_2_temp = [[0, dict(power=0)], [1, dict(power=504)], [2, dict(power=752)], [3, dict(power=964)],
+             [4, dict(power=0)], [5, dict(power=576)], [6, dict(power=988)], [7, dict(power=1212)]]
+
+
+accumulated = defs.accumulate_power_calculate_i_and_losses(stg_G_2[0], 0, 10.5)
+print(stg_G_2[0].nodes.data(),'\n')
+print(stg_G_2[0].edges.data())
+
+excel = defs.accumulate_and_export_to_excel(stg_G_2[0], 0, 10.5)
 
 
 """Отображение первоначальной схемы и ее производных (не поправленной копии)"""
