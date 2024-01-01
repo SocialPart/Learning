@@ -69,18 +69,21 @@ for i in stg_G_2:
     i.add_nodes_from(nodes_G_2)
     nx.set_edge_attributes(i, edges_G_2)
 
-temp = []
-paths = []
+
 
 nodes_G_2_temp = [[0, dict(power=0)], [1, dict(power=504)], [2, dict(power=752)], [3, dict(power=964)],
              [4, dict(power=0)], [5, dict(power=576)], [6, dict(power=988)], [7, dict(power=1212)]]
 
+sources = {'СШ1': [0, 10.3], 'СШ2': [4, 10.2]}
 
-accumulated = defs.accumulate_power_calculate_i_and_losses(stg_G_2[0], 0, 10.5)
+accumulated = defs.accumulate_power_calculate_i_and_losses(stg_G_2[0], sources['СШ1'][0], sources['СШ1'][1])
 print(stg_G_2[0].nodes.data(),'\n')
 print(stg_G_2[0].edges.data())
 
-excel = defs.accumulate_and_export_to_excel(stg_G_2[0], 0, 10.5)
+
+# roots = {"0": "СШ1", "1": "СШ2"}
+# print(roots["0"])
+# excel = defs.accumulate_and_export_to_excel(stg_G_2[0], roots.items() , 10.5)
 
 
 """Отображение первоначальной схемы и ее производных (не поправленной копии)"""

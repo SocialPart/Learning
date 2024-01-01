@@ -169,14 +169,17 @@ def ind_double_graphs(graphs_list):
 """Функция для определения мощностей в узлах, токов протекающих через узел и потерь в линиях"""
 def accumulate_power_calculate_i_and_losses(G, root, U):
     path = []  # Список для хранения текущего пути от корня
-
+    if root == 0:
+        source = 'СШ1'
+    if root == 4:
+        source = 'СШ2'
     def dfs(node):
         path.append(node)  # Добавляем узел к текущему пути
-
+        G.nodes[node]['source'] = source
         # Увеличиваем мощность всех узлов в пути (кроме текущего узла) на мощность текущего узла
         for p_node in path[:-1]:
             G.nodes[p_node]['power'] += G.nodes[node]['power']
-
+            G.nodes[p_node]['source'] = source
         for neighbour in G.neighbors(node):
             if neighbour not in path:
                 # Записываем ребро, через которое мы пришли в узел
@@ -190,64 +193,9 @@ def accumulate_power_calculate_i_and_losses(G, root, U):
 
     # Расчет i и losses для каждого узла и его line
     for node in G.nodes():
-        G.nodes[node]['i'] = G.nodes[node]['power'] / U
+        G.nodes[node]['i'] = round(G.nodes[node]['power'] / U, 3)
         if 'line' in G.nodes[node]:
             u, v = G.nodes[node]['line']
             resistance = G[u][v]['resistance']
-            G[u][v]['losses'] = G.nodes[node]['i'] ** 2 * resistance
-
-
-import pandas as pd
-
-def accumulate_and_export_to_excel(G, root, U, file_name='graph_data.xlsx'):
-    data = []  # Список для хранения данных
-
-    def dfs(node, source):
-        # Добавляем информацию об узле
-        node_data = {
-            'Type': 'Node',
-            'Source': source,
-            'Name': node,
-            'Power': G.nodes[node]['power'],
-            'I': G.nodes[node]['i']
-        }
-        data.append(node_data)
-
-        for neighbour in G.neighbors(node):
-            edge = (node, neighbour)
-            if 'line' in G.nodes[neighbour] and G.nodes[neighbour]['line'] == edge:
-                # Добавляем информацию о ребре
-                edge_data = {
-                    'Type': 'Edge',
-                    'Source': node,
-                    'Name': f"{node}-{neighbour}",
-                    'Resistance': G[node][neighbour]['resistance'],
-                    'Losses': G[node][neighbour]['losses']
-                }
-                data.append(edge_data)
-
-                # Продолжаем обход, если сосед еще не был источником
-                if G.nodes[neighbour]['source'] is None:
-                    G.nodes[neighbour]['source'] = node
-                    dfs(neighbour, node)
-
-    # Инициализация источника для каждого узла
-    for node in G.nodes():
-        G.nodes[node]['source'] = None
-
-    # Начинаем DFS с корня
-    dfs(root, root)
-
-    # Создание DataFrame
-    df = pd.DataFrame(data)
-
-    # Экспорт в Excel
-    df.to_excel(file_name, index=False)
-
-    print("Данные экспортированы в Excel.")
-
-# Предполагается, что G - ваш граф, 'A' - корневой узел и U - параметр напряжения
-# Пример вызова функции:
-# accumulate_and_export_to_excel(G, 'A', U)
-
+            G[u][v]['losses'] = round(G.nodes[node]['i'] ** 2 * resistance, 3)
 
