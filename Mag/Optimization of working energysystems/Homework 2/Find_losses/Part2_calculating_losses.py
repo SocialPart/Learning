@@ -6,19 +6,19 @@ import pandas as pd
 
 """СШ1+СШ2"""
 
-#print("Number of Spanning Trees : ",
-     # defs.num_span_trees(init.G_2))  # Количество остовных деревьев (только для неориентированных графов)
+# print("Number of Spanning Trees : ",
+# defs.num_span_trees(init.G_2))  # Количество остовных деревьев (только для неориентированных графов)
 span_trees_graph_G_2 = defs.spanning_trees_generator(init.G_2)
 "Удаляем ребра из СШ1+СШ2 закоментить блок если надо построить первоначальную схему"
 for i in range(len(span_trees_graph_G_2)):
-    if span_trees_graph_G_2[i].has_edge(1,5):
-        span_trees_graph_G_2[i].remove_edge(1,5)
+    if span_trees_graph_G_2[i].has_edge(1, 5):
+        span_trees_graph_G_2[i].remove_edge(1, 5)
     else:
         if span_trees_graph_G_2[i].has_edge(2, 6):
             span_trees_graph_G_2[i].remove_edge(2, 6)
         else:
-            if span_trees_graph_G_2[i].has_edge(3,7):
-                span_trees_graph_G_2[i].remove_edge(3,7)
+            if span_trees_graph_G_2[i].has_edge(3, 7):
+                span_trees_graph_G_2[i].remove_edge(3, 7)
 "Находим индексы повторяющихся графов"
 t = defs.ind_double_graphs(span_trees_graph_G_2)
 """Зануление повторяющихся графов для удобства отображения. Закоментить блок для продолжения работы, а то графы будут неверные"""
@@ -38,47 +38,79 @@ stg_G_2 = []
 
 for i in range(len(span_trees_graph_G_2) - 1):
     c = 0
-    for j in range(i, (len(span_trees_graph_G_2)- 1)):
+    for j in range(i, (len(span_trees_graph_G_2) - 1)):
         if defs.graphs_equal(span_trees_graph_G_2[i], span_trees_graph_G_2[j + 1]):
             if j != 0:
                 c += 1
     if c == 0:
         stg_G_2.append(span_trees_graph_G_2[i])
-    #print("Количество элемента {0} равно {1}".format(i, c))
+    # print("Количество элемента {0} равно {1}".format(i, c))
 stg_G_2.append(span_trees_graph_G_2[14])
 
 
-"""Делаем график взвешенным для дальнейших расчётов. Задаем первоначальные парметры в узлах"""
-
-"""Задаем параметры линий"""
-
-edges_G_2 = {(0, 1): {'resistance': 1.2}, (1, 2): {'resistance': 0.9},
-             (1, 5): {'resistance': 0.0}, (2, 3): {'resistance': 0.6},
-             (2, 6): {'resistance': 0.0}, (3, 7): {'resistance': 0.0},
-             (7, 6): {'resistance': 0.3}, (6, 5): {'resistance': 0.6},
-             (5, 4): {'resistance': 1.2}}
-
-"""Задаем парамтеры узлов"""
-
-nodes_G_2 = [[0, dict(power=0)], [1, dict(power=504)], [2, dict(power=752)], [3, dict(power=964)],
-             [4, dict(power=0)], [5, dict(power=576)], [6, dict(power=988)], [7, dict(power=1212)]]
-
 """В цикле добавляем все  атрибуты в узлы и линии, т.к. после выдачи всех вариантов взвешенных графов удалились"""
-
+"""Делаем график взвешенным для дальнейших расчётов. Задаем первоначальные парметры в узлах"""
 for i in stg_G_2:
-    i.add_nodes_from(nodes_G_2)
-    nx.set_edge_attributes(i, edges_G_2)
+    i.add_nodes_from(init.nodes)
+    nx.set_edge_attributes(i, init.edges)
 
-
-
-nodes_G_2_temp = [[0, dict(power=0)], [1, dict(power=504)], [2, dict(power=752)], [3, dict(power=964)],
-             [4, dict(power=0)], [5, dict(power=576)], [6, dict(power=988)], [7, dict(power=1212)]]
-
+'Словарь для задания корня обхода графа (питания секции) и уровня напряжения'
 sources = {'СШ1': [0, 10.3], 'СШ2': [4, 10.2]}
 
-accumulated = defs.accumulate_power_calculate_i_and_losses(stg_G_2[0], sources['СШ1'][0], sources['СШ1'][1])
-print(stg_G_2[0].nodes.data(),'\n')
-print(stg_G_2[0].edges.data())
+results_G_2 = []
+
+for i in stg_G_2:
+    stg_G_2_temp = i.copy()
+    accumulated = defs.accumulate_power_calculate_i_and_losses(i, sources['СШ1'][0], sources['СШ1'][1])
+    df = defs.save_to_dataframe(i, init.line_names, init.node_names)
+    accumulated2 = defs.accumulate_power_calculate_i_and_losses(stg_G_2_temp, sources['СШ2'][0], sources['СШ2'][1])
+    df2 = defs.save_to_dataframe(stg_G_2_temp, init.line_names, init.node_names)
+    res = pd.concat([df, df2])
+    results_G_2.append(res)
+    print(type(res))
+print(results_G_2[1])
+# # Создаем список уникальных рёбер из атрибутов 'line' узлов
+# unique_edges = set()
+# for node in stg_G_2[0].nodes(data=True):
+#     if 'line' in node[1]:
+#         unique_edges.add(node[1]['line'])
+#
+# # Собираем данные
+# data = {"Узел": [], "Мощность": [], "I": [], "Источник": [], "Питающая линия": [], "Сопротивление": [], "Потери": []}
+#
+# for node in stg_G_2[0].nodes(data=True):
+#     if 'line' in node[1]:
+#         node_name = node_names.get(node[0], node[0])  # Получаем буквенное наименование узла
+#         data["Узел"].append(node_name)
+#         data["Мощность"].append(node[1].get("power", 0))
+#         data["I"].append(node[1].get("i", 0))
+#         data["Источник"].append(node[1].get("source", ""))
+#
+#         # Добавляем данные о ребрах
+#         edge = node[1]['line']
+#         if edge:
+#             edge_name = line_names.get(tuple(edge), edge)  # Получаем буквенное наименование линии
+#             data["Питающая линия"].append(edge_name)
+#             edge_data = stg_G_2[0][edge[0]][edge[1]]
+#             data["Сопротивление"].append(edge_data.get("resistance", 0))
+#             data["Потери"].append(edge_data.get("losses", 0))
+#         else:
+#             data["Питающая линия"].append(None)
+#             data["Сопротивление"].append(None)
+#             data["Потери"].append(None)
+#
+# # Создаем DataFrame
+# df = pd.DataFrame(data)
+#
+# # Экспорт в Excel
+# df.to_excel("graph_data.xlsx", index=False)
+
+for i, df in enumerate(results_G_2):
+    df.insert(0, 'Вариант схемы', f"Схема {i+1}")
+
+combined_df = pd.concat(results_G_2)
+combined_df.to_excel("СШ1_СШ2.xlsx", index=False)
+
 
 
 # roots = {"0": "СШ1", "1": "СШ2"}
@@ -122,7 +154,6 @@ print(stg_G_2[0].edges.data())
 # plt.show()
 
 
-
 """Проверка содержания stg_G_2. Закоментить, если не нужно"""
 
 # """Фиксируем позиции узлов графов для понятного отображения"""
@@ -154,8 +185,8 @@ print(stg_G_2[0].edges.data())
 
 """СШ1"""
 span_trees_graph_G_1_1 = defs.spanning_trees_generator(init.G_1_1)
-#print("Number of Spanning Trees : ",
-      #defs.num_span_trees(init.G_1_1))  # Количество остовных деревьев (только для неориентированных графов)
+# print("Number of Spanning Trees : ",
+# defs.num_span_trees(init.G_1_1))  # Количество остовных деревьев (только для неориентированных графов)
 
 
 # """Фиксируем позиции узлов графов для понятного отображения"""
@@ -194,8 +225,8 @@ span_trees_graph_G_1_1 = defs.spanning_trees_generator(init.G_1_1)
 """СШ2"""
 span_trees_graph_G_1_2 = defs.spanning_trees_generator(init.G_1_2)
 #
-#print("Number of Spanning Trees : ",
- #     defs.num_span_trees(init.G_1_2))  # Количество остовных деревьев (только для неориентированных графов)
+# print("Number of Spanning Trees : ",
+#     defs.num_span_trees(init.G_1_2))  # Количество остовных деревьев (только для неориентированных графов)
 
 
 """Строим графическое отображение графов"""

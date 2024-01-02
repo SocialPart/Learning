@@ -1,6 +1,7 @@
 #defs.py
 import numpy as np
 import networkx as nx
+import pandas as pd
 from itertools import product
 
 
@@ -166,7 +167,8 @@ def ind_double_graphs(graphs_list):
 #     dfs(root)
 #     return accumulated_power
 
-"""Функция для определения мощностей в узлах, токов протекающих через узел и потерь в линиях"""
+"""Функция для определения мощностей в узлах, токов протекающих через узел и потерь в линиях.
+Результат расчёта - в виде атрибутов узлов и ребер графа"""
 def accumulate_power_calculate_i_and_losses(G, root, U):
     path = []  # Список для хранения текущего пути от корня
     if root == 0:
@@ -197,5 +199,41 @@ def accumulate_power_calculate_i_and_losses(G, root, U):
         if 'line' in G.nodes[node]:
             u, v = G.nodes[node]['line']
             resistance = G[u][v]['resistance']
-            G[u][v]['losses'] = round(G.nodes[node]['i'] ** 2 * resistance, 3)
+            G[u][v]['losses'] = round((G.nodes[node]['i'] ** 2 * resistance)/1000, 3)
 
+def save_to_dataframe (G, line_names, node_names):
+    # Создаем список уникальных рёбер из атрибутов 'line' узлов
+    unique_edges = set()
+    for node in G.nodes(data=True):
+        if 'line' in node[1]:
+            unique_edges.add(node[1]['line'])
+
+    # Собираем данные
+    data = {"Узел": [], "Мощность": [], "I": [], "Источник": [], "Питающая линия": [], "Сопротивление": [], "Потери": []}
+
+    for node in G.nodes(data=True):
+        if 'line' in node[1]:
+            node_name = node_names.get(node[0], node[0])  # Получаем буквенное наименование узла
+            data["Узел"].append(node_name)
+            data["Мощность"].append(node[1].get("power", 0))
+            data["I"].append(node[1].get("i", 0))
+            data["Источник"].append(node[1].get("source", ""))
+
+            # Добавляем данные о ребрах
+            edge = node[1]['line']
+            if edge:
+                edge_name = line_names.get(tuple(edge), edge)  # Получаем буквенное наименование линии
+                data["Питающая линия"].append(edge_name)
+                edge_data = G[edge[0]][edge[1]]
+                data["Сопротивление"].append(edge_data.get("resistance", 0))
+                data["Потери"].append(edge_data.get("losses", 0))
+            else:
+                data["Питающая линия"].append(None)
+                data["Сопротивление"].append(None)
+                data["Потери"].append(None)
+
+    # Создаем DataFrame
+    df = pd.DataFrame(data)
+    return df
+    # Экспорт в Excel
+    # df.to_excel("graph_data.xlsx", index=False)
