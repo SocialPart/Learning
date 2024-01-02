@@ -61,14 +61,14 @@ results_G_2 = []
 
 for i in stg_G_2:
     stg_G_2_temp = i.copy()
-    accumulated = defs.accumulate_power_calculate_i_and_losses(i, sources['СШ1'][0], sources['СШ1'][1])
-    df = defs.save_to_dataframe(i, init.line_names, init.node_names)
-    accumulated2 = defs.accumulate_power_calculate_i_and_losses(stg_G_2_temp, sources['СШ2'][0], sources['СШ2'][1])
-    df2 = defs.save_to_dataframe(stg_G_2_temp, init.line_names, init.node_names)
+    defs.accumulate_power_calculate_i_and_losses(i, sources['СШ1'][0], sources['СШ1'][1])
+    df = defs.save_to_dataframe(i, init.line_names_G_2, init.node_names_G_2)
+    defs.accumulate_power_calculate_i_and_losses(stg_G_2_temp, sources['СШ2'][0], sources['СШ2'][1])
+    df2 = defs.save_to_dataframe(stg_G_2_temp, init.line_names_G_2, init.node_names_G_2)
     res = pd.concat([df, df2])
     results_G_2.append(res)
-    print(type(res))
-print(results_G_2[1])
+    #print(type(res))
+#print(results_G_2[1])
 # # Создаем список уникальных рёбер из атрибутов 'line' узлов
 # unique_edges = set()
 # for node in stg_G_2[0].nodes(data=True):
@@ -110,12 +110,6 @@ for i, df in enumerate(results_G_2):
 
 combined_df = pd.concat(results_G_2)
 combined_df.to_excel("СШ1_СШ2.xlsx", index=False)
-
-
-
-# roots = {"0": "СШ1", "1": "СШ2"}
-# print(roots["0"])
-# excel = defs.accumulate_and_export_to_excel(stg_G_2[0], roots.items() , 10.5)
 
 
 """Отображение первоначальной схемы и ее производных (не поправленной копии)"""
@@ -222,8 +216,43 @@ span_trees_graph_G_1_1 = defs.spanning_trees_generator(init.G_1_1)
 #         n += 1
 # plt.show()
 #
+for i in span_trees_graph_G_1_1:
+    i.add_nodes_from(init.param_nodes_G_1_1)
+    nx.set_edge_attributes(i, init.param_edges_G_1_1)
+
+results_G_1_1 = []
+
+for i in span_trees_graph_G_1_1:
+    defs.accumulate_power_calculate_i_and_losses(i, sources['СШ1'][0], sources['СШ1'][1])
+    df = defs.save_to_dataframe(i, init.line_names_G_1_1, init.node_names_G_1_1)
+    results_G_1_1.append(df)
+
+for i, df in enumerate(results_G_1_1):
+    df.insert(0, 'Вариант схемы', f"Схема {i+1}")
+
+combined_df = pd.concat(results_G_1_1)
+combined_df.to_excel("СШ1.xlsx", index=False)
+
 """СШ2"""
 span_trees_graph_G_1_2 = defs.spanning_trees_generator(init.G_1_2)
+
+for i in span_trees_graph_G_1_2:
+    i.add_nodes_from(init.param_nodes_G_1_2)
+    nx.set_edge_attributes(i, init.param_edges_G_1_2)
+    print(i.edges.data())
+results_G_1_2 = []
+
+for i in span_trees_graph_G_1_2:
+    defs.accumulate_power_calculate_i_and_losses(i, sources['СШ2'][0], sources['СШ2'][1])
+    df = defs.save_to_dataframe(i, init.line_names_G_1_2, init.node_names_G_1_2)
+    results_G_1_2.append(df)
+
+for i, df in enumerate(results_G_1_2):
+    df.insert(0, 'Вариант схемы', f"Схема {i+1}")
+
+combined_df = pd.concat(results_G_1_2)
+combined_df.to_excel("СШ2.xlsx", index=False)
+
 #
 # print("Number of Spanning Trees : ",
 #     defs.num_span_trees(init.G_1_2))  # Количество остовных деревьев (только для неориентированных графов)
