@@ -138,7 +138,7 @@ defs.plot_multiple_networkx_graphs(span_trees_graph_G_1_1, init.node_names_G_1_1
 
 sources_1_2 = {'СШ2': [3, 10.2]}
 
-"""Нахождение всех остовныъ деревьев"""
+"""Нахождение всех остовных деревьев"""
 span_trees_graph_G_1_2 = defs.spanning_trees_generator(init.G_1_2)
 
 """После нахождения всех графов делаем их взвешенными для проведения расчётов"""
