@@ -237,7 +237,7 @@ def save_to_dataframe (G, line_names, node_names):
     return df
 
 
-def plot_multiple_networkx_graphs(graphs, layout_func=nx.spring_layout, rows=1, cols=1):
+def plot_multiple_networkx_graphs(graphs, labels, layout_func=nx.spring_layout, rows=1, cols=1):
     """
     Функция для отображения нескольких графов NetworkX в одном окне.
 
@@ -250,10 +250,11 @@ def plot_multiple_networkx_graphs(graphs, layout_func=nx.spring_layout, rows=1, 
 
     for i, G in enumerate(graphs, 1):
         plt.subplot(rows, cols, i)
+        plt.subplots_adjust(wspace=0.5, hspace=1.3)
         #pos = layout_func(G)
         nx.draw(G, layout_func, with_labels=True, font_size=8,
-                font_weight='bold', node_color='lightgreen', node_size=150, edge_color='r')
-        plt.title(f'Граф {i}')
+                font_weight='bold', node_color='lightgreen', labels=labels, node_size=150, edge_color='r')
+        plt.title(i, fontsize=10, verticalalignment='top', fontweight='bold')
 
     plt.tight_layout()
     plt.show()

@@ -1,9 +1,11 @@
 # initial.py
 import networkx as nx
 
-"""Задаем параметры линий"""
+"""СШ1 + СШ2"""
 
-edges = {(0, 1): {'resistance': 1.2}, (1, 2): {'resistance': 0.9},
+"""Задаем параметры линий. После нахождения всех графов, они становятся не взвешенными"""
+
+param_edges_G_2 = {(0, 1): {'resistance': 1.2}, (1, 2): {'resistance': 0.9},
          (1, 5): {'resistance': 0.0}, (2, 3): {'resistance': 0.6},
          (2, 6): {'resistance': 0.0}, (3, 7): {'resistance': 0.0},
          (7, 6): {'resistance': 0.3}, (6, 5): {'resistance': 0.6},
@@ -11,8 +13,8 @@ edges = {(0, 1): {'resistance': 1.2}, (1, 2): {'resistance': 0.9},
 
 """Задаем парамтеры узлов"""
 
-nodes = [[0, dict(power=0)], [1, dict(power=504)], [2, dict(power=752)], [3, dict(power=964)],
-         [4, dict(power=0)], [5, dict(power=576)], [6, dict(power=988)], [7, dict(power=1212)]]
+param_nodes_G2 = [[0, dict(power=0)], [1, dict(power=504)], [2, dict(power=752)], [3, dict(power=964)],
+                  [4, dict(power=0)], [5, dict(power=576)], [6, dict(power=988)], [7, dict(power=1212)]]
 
 """Схема с двумя секциями шин"""
 

@@ -255,7 +255,7 @@ def plot_multiple_networkx_graphs(graphs, labels, layout_func=nx.spring_layout, 
         #pos = layout_func(G)
         nx.draw(G, layout_func, with_labels=True, font_size=8,
                 font_weight='bold', node_color='lightgreen', labels=labels, node_size=150, edge_color='r')
-        plt.title(f'Граф {i}')
+        plt.title(i, fontsize=10, verticalalignment='top', fontweight='bold')
 
     plt.tight_layout()
     plt.show()

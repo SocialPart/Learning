@@ -1,5 +1,4 @@
 import networkx as nx
-import matplotlib.pyplot as plt
 import Initial_for_losses as init
 import defs
 import pandas as pd
@@ -8,6 +7,7 @@ import pandas as pd
 
 # print("Number of Spanning Trees : ",
 # defs.num_span_trees(init.G_2))  # Количество остовных деревьев (только для неориентированных графов)
+"""Нахождение всех остовных деревьев"""
 span_trees_graph_G_2 = defs.spanning_trees_generator(init.G_2)
 "Удаляем ребра из СШ1+СШ2 закоментить блок если надо построить первоначальную схему"
 for i in range(len(span_trees_graph_G_2)):
@@ -51,8 +51,8 @@ stg_G_2.append(span_trees_graph_G_2[14])
 """В цикле добавляем все  атрибуты в узлы и линии, т.к. после выдачи всех вариантов взвешенных графов удалились"""
 """Делаем график взвешенным для дальнейших расчётов. Задаем первоначальные парметры в узлах"""
 for i in stg_G_2:
-    i.add_nodes_from(init.nodes)
-    nx.set_edge_attributes(i, init.edges)
+    i.add_nodes_from(init.param_nodes_G2)
+    nx.set_edge_attributes(i, init.param_edges_G_2)
 
 'Словарь для задания корня обхода графа (питания секции) и уровня напряжения'
 sources = {'СШ1': [0, 10.3], 'СШ2': [4, 10.2]}
@@ -94,31 +94,33 @@ defs.plot_multiple_networkx_graphs([init.G_2], init.node_names_G_2, pos_G_2, 1, 
 """Построение всех графов"""
 defs.plot_multiple_networkx_graphs(stg_G_2, init.node_names_G_2, pos_G_2, 4, 3)
 
-
-
 """СШ1"""
 
 """Так как список узлов  меняется - корень соответственно тоже, заново задаем корень и уровень напряжения"""
-
 sources_1_1 = {'СШ1': [0, 10.3]}
 
+"""Нахождение всех остовных деревьев"""
 span_trees_graph_G_1_1 = defs.spanning_trees_generator(init.G_1_1)
 
-#
+"""После нахождения всех графов делаем их взвешенными для проведения расчётов"""
 for i in span_trees_graph_G_1_1:
     i.add_nodes_from(init.param_nodes_G_1_1)
     nx.set_edge_attributes(i, init.param_edges_G_1_1)
 
+"""Создание списка для результатов расчёта в виде датафреймов"""
 results_G_1_1 = []
 
+"""Расчёт параметров мощности токов и потерь на графах. Затем экспорт в датафреймы и наполнение результирующего списка"""
 for i in span_trees_graph_G_1_1:
     defs.accumulate_power_calculate_i_and_losses(i, sources['СШ1'][0], sources['СШ1'][1])
     df = defs.save_to_dataframe(i, init.line_names_G_1_1, init.node_names_G_1_1)
     results_G_1_1.append(df)
 
+"""Добавление всем датафреймам результирующего списка колонки с номером схемы"""
 for i, df in enumerate(results_G_1_1):
     df.insert(0, 'Вариант схемы', f"Схема {i + 1}")
 
+"""Формирование единого датафрейма и дальнейший экспорт в Excel-файл"""
 combined_df = pd.concat(results_G_1_1)
 combined_df.to_excel("СШ1.xlsx", index=False)
 
@@ -126,9 +128,9 @@ combined_df.to_excel("СШ1.xlsx", index=False)
 pos_G_1_1 = nx.spring_layout(init.G_1_1, k=None, pos=init.positions_G_1_1, fixed=init.nodes_G_1_1,
                              iterations=2, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
 
-defs.plot_multiple_networkx_graphs(span_trees_graph_G_1_1, init.node_names_G_1_1, pos_G_1_1, 5, 3)
+"""Построение начального и совокупности графов решений"""
 defs.plot_multiple_networkx_graphs([init.G_1_1], init.node_names_G_1_1, pos_G_1_1, 1, 1)
-
+defs.plot_multiple_networkx_graphs(span_trees_graph_G_1_1, init.node_names_G_1_1, pos_G_1_1, 5, 3)
 
 """СШ2"""
 
@@ -136,32 +138,37 @@ defs.plot_multiple_networkx_graphs([init.G_1_1], init.node_names_G_1_1, pos_G_1_
 
 sources_1_2 = {'СШ2': [3, 10.2]}
 
+"""Нахождение всех остовныъ деревьев"""
 span_trees_graph_G_1_2 = defs.spanning_trees_generator(init.G_1_2)
 
+"""После нахождения всех графов делаем их взвешенными для проведения расчётов"""
 for i in span_trees_graph_G_1_2:
     i.add_nodes_from(init.param_nodes_G_1_2)
     nx.set_edge_attributes(i, init.param_edges_G_1_2)
-    print(i.edges.data(), '\n')
-    print(i.nodes.data(), '\n')
 
+"""Создание списка для результатов расчёта в виде датафреймов"""
 results_G_1_2 = []
 
+"""Расчёт параметров мощности токов и потерь на графах. Затем экспорт в датафреймы и наполнение результирующего списка"""
 for i in span_trees_graph_G_1_2:
     defs.accumulate_power_calculate_i_and_losses(i, sources_1_2['СШ2'][0], sources_1_2['СШ2'][1])
     df = defs.save_to_dataframe(i, init.line_names_G_1_2, init.node_names_G_1_2)
     results_G_1_2.append(df)
 
+"""Добавление всем датафреймам результирующего списка колонки с номером схемы"""
 for i, df in enumerate(results_G_1_2):
     df.insert(0, 'Вариант схемы', f"Схема {i + 1}")
 
+"""Формирование единого датафрейма и дальнейший экспорт в Excel-файл"""
 combined_df = pd.concat(results_G_1_2)
 combined_df.to_excel("СШ2.xlsx", index=False)
 
 """Строим графическое отображение графов"""
 
-"""Фиксируем позиции узлов графов для понятного отображения"""
+"""Задание режима отображения графа. Фиксация точек"""
 pos_G_1_2 = nx.spring_layout(init.G_1_2, k=None, pos=init.positions_G_1_2, fixed=init.nodes_G_1_2,
                              iterations=2, threshold=0.0001, weight='weight', scale=1, center=None, dim=2, seed=None)
-
-defs.plot_multiple_networkx_graphs(span_trees_graph_G_1_2, init.node_names_G_1_2, pos_G_1_2, 5, 3)
+"""Построение начального и совокупности графов решений"""
 defs.plot_multiple_networkx_graphs([init.G_1_2], init.node_names_G_1_2, pos_G_1_2, 1, 1)
+defs.plot_multiple_networkx_graphs(span_trees_graph_G_1_2, init.node_names_G_1_2, pos_G_1_2, 5, 3)
+
