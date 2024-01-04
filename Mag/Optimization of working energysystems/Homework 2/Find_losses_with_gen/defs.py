@@ -2,6 +2,7 @@
 import numpy as np
 import networkx as nx
 import pandas as pd
+import matplotlib.pyplot as plt
 from itertools import product
 
 
@@ -135,7 +136,6 @@ def edges_equal(edges1, edges2):
 
 """Выдача индексов одинаковых графов в списке"""
 def ind_double_graphs(graphs_list):
-
     temp = []
     for i in range(len(graphs_list) - 1):
         for j in range(i, (len(graphs_list) - 1)):
@@ -235,5 +235,25 @@ def save_to_dataframe (G, line_names, node_names):
     # Создаем DataFrame
     df = pd.DataFrame(data)
     return df
-    # Экспорт в Excel
-    # df.to_excel("graph_data.xlsx", index=False)
+
+
+def plot_multiple_networkx_graphs(graphs, layout_func=nx.spring_layout, rows=1, cols=1):
+    """
+    Функция для отображения нескольких графов NetworkX в одном окне.
+
+    :param graphs: список графов NetworkX
+    :param layout_func: функция расположения узлов (по умолчанию nx.spring_layout)
+    :param rows: количество строк в сетке подграфиков
+    :param cols: количество колонок в сетке подграфиков
+    """
+    plt.figure(figsize=(cols * 4, rows * 3))
+
+    for i, G in enumerate(graphs, 1):
+        plt.subplot(rows, cols, i)
+        #pos = layout_func(G)
+        nx.draw(G, layout_func, with_labels=True, font_size=8,
+                font_weight='bold', node_color='lightgreen', node_size=150, edge_color='r')
+        plt.title(f'Граф {i}')
+
+    plt.tight_layout()
+    plt.show()

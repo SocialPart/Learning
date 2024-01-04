@@ -153,3 +153,36 @@ G.add_edge("C", "F")
 # Расчет накопленной мощности
 accumulated_power = accumulate_power(G, "A")
 print(accumulated_power)
+
+import matplotlib.pyplot as plt
+import networkx as nx
+
+
+def plot_multiple_networkx_graphs(graphs, layout_func=nx.spring_layout, rows=1, cols=1):
+    """
+    Функция для отображения нескольких графов NetworkX в одном окне.
+
+    :param graphs: список графов NetworkX
+    :param layout_func: функция расположения узлов (по умолчанию nx.spring_layout)
+    :param rows: количество строк в сетке подграфиков
+    :param cols: количество колонок в сетке подграфиков
+    """
+    plt.figure(figsize=(cols * 4, rows * 3))
+
+    for i, G in enumerate(graphs, 1):
+        plt.subplot(rows, cols, i)
+        pos = layout_func(G)
+        nx.draw(G, pos, with_labels=True, node_color='lightblue', edge_color='gray')
+        plt.title(f'Граф {i}')
+
+    plt.tight_layout()
+    plt.show()
+
+
+# Пример использования
+G1 = nx.petersen_graph()
+G2 = nx.tutte_graph()
+G3 = nx.sedgewick_maze_graph()
+G4 = nx.tetrahedral_graph()
+
+plot_multiple_networkx_graphs([G1, G2, G3, G4], rows=2, cols=2)
