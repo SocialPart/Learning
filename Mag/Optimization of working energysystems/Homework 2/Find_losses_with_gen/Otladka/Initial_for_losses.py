@@ -14,7 +14,7 @@ param_edges_G_2 = {(0, 1): {'resistance': 1.2}, (1, 2): {'resistance': 0.9},
 """Задаем парамтеры узлов"""
 
 param_nodes_G2 = [[0, dict(power=0)], [1, dict(power=504)], [2, dict(power=752)], [3, dict(power=964)],
-                  [4, dict(power=0)], [5, dict(power=576)], [6, dict(power=988)], [7, dict(power=-588)]]
+                  [4, dict(power=0)], [5, dict(power=576)], [6, dict(power=988)], [7, dict(power=-588, generation=1800)]]
 
 """Схема с двумя секциями шин"""
 
@@ -57,7 +57,7 @@ param_edges_G_1_1 = {(0, 1): {'resistance': 1.2}, (1, 2): {'resistance': 0.9},
 """Задаем парамтеры узлов"""
 
 param_nodes_G_1_1 = [[0, dict(power=0)], [1, dict(power=504)], [2, dict(power=752)], [3, dict(power=964)],
-                     [4, dict(power=576)], [5, dict(power=988)], [6, dict(power=-588)]]
+                     [4, dict(power=576)], [5, dict(power=988)], [6, dict(power=1212)]]
 
 G_1_1 = nx.Graph()  # Создаем объект для графа
 

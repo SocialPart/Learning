@@ -259,27 +259,7 @@ def plot_multiple_networkx_graphs(graphs, labels, layout_func=nx.spring_layout, 
     plt.tight_layout()
     plt.show()
 
-def accumulate_power(G, root, U):
-    def dfs(node, parent=None, total_power=0):
-        # Вычисление суммарной мощности для текущего узла
-        node_power = G.nodes[node].get('power', 0)
-        net_power = total_power + node_power
 
-        # Если мощность отрицательная (генерация), то она передается дальше
-        G.nodes[node]['power'] = max(0, net_power)
-        G.nodes[node]['i'] = abs(G.nodes[node]['power']) / U  # Расчет тока с учетом направления мощности
 
-        for neighbor in G.neighbors(node):
-            if neighbor != parent:
-                dfs(neighbor, node, net_power)
 
-                # Расчет потерь на линии
-                edge = (node, neighbor) if (node, neighbor) in G.edges else (neighbor, node)
-                resistance = G.edges[edge].get('resistance', 0)
-                G.edges[edge]['losses'] = G.nodes[neighbor]['i'] ** 2 * resistance
 
-    G.nodes[root]['power'] = G.nodes[root].get('power', 0)
-    dfs(root)
-
-# Для примера добавления генератора:
-# G.nodes[generator_node]['power'] = -generated_power
